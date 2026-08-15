@@ -17,8 +17,8 @@ function ShowDetailsModal({ item, isOpen, onClose, onAdd }) {
       title: item.title,
       poster,
       rating: Math.round((item.vote_average || 0) * 10) / 10,
-      episodesWatched: 0,
-      totalEpisodes: 0,
+      episodesWatched: status === "COMPLETED" ? item.totalEpisodes : 0,
+      totalEpisodes: item.totalEpisodes || 0,
       type: item.media_type === "movie" ? "Movie" : "TV",
       status,
     };

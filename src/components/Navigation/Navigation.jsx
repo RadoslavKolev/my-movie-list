@@ -1,7 +1,21 @@
 import PropTypes from "prop-types";
 import "./Navigation.scss";
+import { buildTmdbPosterPath } from "../../api/tmdb";
 
-function Navigation({ navItems, activeFilter, onFilterChange, searchQuery, onSearchChange, searchResults = [], onSelectResult }) {
+function Navigation({
+  navItems,
+  activeFilter,
+  onFilterChange,
+  searchQuery,
+  onSearchChange,
+  searchResults = [],
+  isSearching = false,
+  onSelectResult,
+}) {
+  const hasTmdbKey = Boolean(import.meta.env.VITE_TMDB_API_KEY);
+  const shouldShowNoResults =
+    searchQuery?.trim() && !isSearching && searchResults.length === 0;
+
   return (
     <header className="navbar">
       <div className="navbar-content">
@@ -34,29 +48,49 @@ function Navigation({ navItems, activeFilter, onFilterChange, searchQuery, onSea
             autoComplete="off"
           />
 
-          {searchResults && searchResults.length > 0 && (
+          {searchResults?.length > 0 && (
             <ul className="search-results">
               {searchResults.map((r) => (
-                <li
-                  key={r.id}
-                  tabIndex={0}
-                  onMouseDown={() => onSelectResult && onSelectResult(r)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" || e.key === " ") onSelectResult && onSelectResult(r);
-                  }}
-                >
-                  <div className="result-title">{r.title}</div>
-                  <div className="result-meta">{r.media_type.toUpperCase()} • {r.date}</div>
+                <li key={r.id} className="search-result-item">
+                  <button
+                    type="button"
+                    className="search-result-button"
+                    onClick={() => onSelectResult?.(r)}
+                  >
+                    <img
+                      src={buildTmdbPosterPath(r.poster_path)}
+                      alt={r.title}
+                      className="result-poster"
+                    />
+                    <div className="result-copy">
+                      <div className="result-title-row">
+                        <span className="result-title">{r.title}</span>
+                        <span className="result-rating">
+                          {r.vote_average > 0 ? `★ ${r.vote_average.toFixed(1)}` : "N/A"}
+                        </span>
+                      </div>
+
+                      <div className="result-meta-row">
+                        <span className="result-type">
+                          {r.media_type?.toUpperCase() || "TV"}
+                        </span>
+                        <span className="result-date">
+                          {r.date ? new Date(r.date).getFullYear() : "Unknown"}
+                        </span>
+                      </div>
+                    </div>
+                  </button>
                 </li>
               ))}
             </ul>
           )}
-          {!searchResults?.length && searchQuery?.trim() && (
+
+          {shouldShowNoResults && (
             <div className="search-empty">
-              {!import.meta.env.VITE_TMDB_API_KEY ? (
-                <div className="no-key">TMDB API key not configured. Create a .env with <strong>VITE_TMDB_API_KEY</strong>.</div>
-              ) : (
+              {hasTmdbKey ? (
                 <div className="no-results">No results found.</div>
+              ) : (
+                <div className="no-key">TMDB API key not configured.</div>
               )}
             </div>
           )}
@@ -78,6 +112,7 @@ Navigation.propTypes = {
   searchQuery: PropTypes.string.isRequired,
   onSearchChange: PropTypes.func.isRequired,
   searchResults: PropTypes.array,
+  isSearching: PropTypes.bool,
   onSelectResult: PropTypes.func,
 };
 

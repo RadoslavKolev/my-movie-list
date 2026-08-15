@@ -5,7 +5,7 @@ import ShowCard from "./components/ShowCard/ShowCard";
 import Navigation from "./components/Navigation/Navigation";
 import AddShowModal from "./components/AddShowModal/AddShowModal";
 import ShowDetailsModal from "./components/ShowDetailsModal/ShowDetailsModal";
-import { searchTMDB } from "./api/tmdb";
+import { searchTMDB, getTMDBDetails } from "./api/tmdb";
 
 const navItems = [
   { value: "ALL", label: "All Shows" },
@@ -82,33 +82,35 @@ const initialShows = [
 function App() {
   const [shows, setShows] = useState(initialShows);
   const [activeFilter, setActiveFilter] = useState("CURRENTLY WATCHING");
-  // `navSearch` is for TMDB queries from the top nav. The main list search
-  // will be a separate feature later and should not be tied to this.
   const [navSearch, setNavSearch] = useState("");
   const [searchResults, setSearchResults] = useState([]);
+  const [isSearching, setIsSearching] = useState(false);
   const tmdbAvailable = Boolean(import.meta.env.VITE_TMDB_API_KEY);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedTMDB, setSelectedTMDB] = useState(null);
   const searchTimer = useRef(null);
 
   useEffect(() => {
-    // debounce nav search (TMDB)
     if (searchTimer.current) clearTimeout(searchTimer.current);
-    if (!navSearch || !navSearch.trim()) {
-      // clear results asynchronously to avoid synchronous setState in effect
-      setTimeout(() => setSearchResults([]), 0);
+
+    if (!navSearch?.trim()) {
+      setTimeout(() => {
+        setIsSearching(false);
+        setSearchResults([]);
+      }, 0);
       return;
     }
+
     searchTimer.current = setTimeout(async () => {
+      setIsSearching(true);
       const res = await searchTMDB(navSearch);
       setSearchResults(res);
+      setIsSearching(false);
     }, 350);
 
     return () => clearTimeout(searchTimer.current);
   }, [navSearch]);
 
-  // For now the grid filters only by status. Main-search (local) will be
-  // implemented separately — the navbar search hits TMDB instead.
   const filteredShows = shows.filter((show) => {
     const matchesStatus = activeFilter === "ALL" ? true : show.status === activeFilter;
     return matchesStatus;
@@ -122,14 +124,16 @@ function App() {
     setActiveFilter(newShow.status);
   };
 
-  const handleSelectResult = (item) => {
-    setSelectedTMDB(item);
+  const handleSelectResult = async (item) => {
+    const enriched = await getTMDBDetails(item.media_type, item.tmdbId);
+    const finalItem = enriched || item;
+
+    setSelectedTMDB(finalItem);
     setSearchResults([]);
     setNavSearch("");
   };
 
   const handleAddFromTMDB = (newShow) => {
-    // when adding from TMDB, preserve as added show
     setShows((prev) => [newShow, ...prev]);
     setActiveFilter(newShow.status);
   };
@@ -143,6 +147,7 @@ function App() {
         searchQuery={navSearch}
         onSearchChange={setNavSearch}
         searchResults={searchResults}
+        isSearching={isSearching}
         onSelectResult={handleSelectResult}
         tmdbAvailable={tmdbAvailable}
       />
@@ -151,7 +156,6 @@ function App() {
         <div className="toolbar">
           <h1>{activeTitle}</h1>
         </div>
-
 
         <div className="shows-grid">
           {filteredShows.map((show) => (
