@@ -105,6 +105,54 @@
           box-shadow: 0 0 0 2px rgba(24, 229, 231, 0.14);
         }
       }
+
+      .search-results {
+        position: absolute;
+        top: 40px;
+        right: 0;
+        width: 360px;
+        max-height: 320px;
+        overflow: auto;
+        background: #0f0b15;
+        border: 1px solid rgba(255,255,255,0.06);
+        border-radius: 8px;
+        box-shadow: 0 8px 30px rgba(0,0,0,0.6);
+        padding: 6px;
+        z-index: 200;
+
+        li {
+          padding: 8px 10px;
+          cursor: pointer;
+          border-radius: 6px;
+
+          &:hover { background: rgba(255,255,255,0.02); }
+
+          .result-title { color: #f7f3fb; font-weight:700 }
+          .result-meta { color: #bdb5c6; font-size:0.85rem }
+        }
+      }
+      .search-empty {
+        position: absolute;
+        top: 40px;
+        right: 0;
+        width: 360px;
+        background: #0f0b15;
+        border: 1px solid rgba(255,255,255,0.06);
+        border-radius: 8px;
+        padding: 12px;
+        color: #cfc7db;
+        z-index: 200;
+
+        .no-key {
+          color: #ffd6d6;
+          font-size: 0.9rem;
+        }
+
+        .no-results {
+          color: #cfc7db;
+          font-size: 0.9rem;
+        }
+      }
     }
   }
 }
