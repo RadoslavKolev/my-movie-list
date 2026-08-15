@@ -1,7 +1,7 @@
 import PropTypes from "prop-types";
 import "./Navigation.scss";
 
-function Navigation({ navItems, activeFilter, onFilterChange }) {
+function Navigation({ navItems, activeFilter, onFilterChange, searchQuery, onSearchChange }) {
   return (
     <header className="navbar">
       <div className="navbar-content">
@@ -20,6 +20,19 @@ function Navigation({ navItems, activeFilter, onFilterChange }) {
             </button>
           ))}
         </nav>
+
+        <div className="navbar-search" role="search">
+          <span className="search-icon" aria-hidden="true">
+            ⌕
+          </span>
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(event) => onSearchChange(event.target.value)}
+            placeholder="Search..."
+            aria-label="Search shows"
+          />
+        </div>
       </div>
     </header>
   );
@@ -34,6 +47,8 @@ Navigation.propTypes = {
   ).isRequired,
   activeFilter: PropTypes.string.isRequired,
   onFilterChange: PropTypes.func.isRequired,
+  searchQuery: PropTypes.string.isRequired,
+  onSearchChange: PropTypes.func.isRequired,
 };
 
 export default Navigation;

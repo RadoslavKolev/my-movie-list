@@ -1,0 +1,112 @@
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(5, 4, 12, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal {
+  width: min(560px, calc(100vw - 32px));
+  background: #17142a;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
+  overflow: hidden;
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(27, 0, 52, 0.9);
+
+  h2 {
+    margin: 0;
+    font-size: 1.4rem;
+    color: #ffffff;
+  }
+}
+
+.close-button {
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 50%;
+  background: #e7ecff;
+  color: #111827;
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+
+.modal-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 20px;
+
+  label {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    color: #e6e0ee;
+    font-size: 0.9rem;
+    font-weight: 600;
+  }
+
+  input,
+  select {
+    width: 100%;
+    height: 42px;
+    padding: 0 12px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 8px;
+    background: rgba(0, 0, 0, 0.2);
+    color: #ffffff;
+    font-size: 0.95rem;
+    outline: none;
+
+    &:focus {
+      border-color: #18e5e7;
+      box-shadow: 0 0 0 2px rgba(24, 229, 231, 0.15);
+    }
+  }
+
+  .form-row {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+  }
+
+  .modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 8px;
+  }
+
+  .primary-button,
+  .secondary-button {
+    height: 40px;
+    padding: 0 18px;
+    border-radius: 8px;
+    border: none;
+    font-size: 0.9rem;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  .primary-button {
+    background: #18e5e7;
+    color: #0d1425;
+  }
+
+  .secondary-button {
+    background: #eef1ff;
+    color: #151b2c;
+  }
+}

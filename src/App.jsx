@@ -3,6 +3,7 @@ import { useState } from "react";
 // Components
 import ShowCard from "./components/ShowCard/ShowCard";
 import Navigation from "./components/Navigation/Navigation";
+import AddShowModal from "./components/AddShowModal/AddShowModal";
 
 const navItems = [
   { value: "ALL", label: "All Shows" },
@@ -14,10 +15,10 @@ const navItems = [
 ];
 
 // Dummy data for testing
-const shows = [
+const initialShows = [
   {
     id: 1,
-    title: "Breaking Bad",
+    title: "Spirited Away",
     poster:
       "https://image.tmdb.org/t/p/w500/39wmItIWsg5sZMyRUHLkWBcuVCM.jpg",
     rating: 9,
@@ -77,15 +78,29 @@ const shows = [
 ];
 
 function App() {
+  const [shows, setShows] = useState(initialShows);
   const [activeFilter, setActiveFilter] = useState("CURRENTLY WATCHING");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const filteredShows =
-    activeFilter === "ALL"
-      ? shows
-      : shows.filter((show) => show.status === activeFilter);
+  const filteredShows = shows.filter((show) => {
+    const matchesStatus =
+      activeFilter === "ALL" ? true : show.status === activeFilter;
+
+    const matchesSearch = show.title
+      .toLowerCase()
+      .includes(searchQuery.trim().toLowerCase());
+
+    return matchesStatus && matchesSearch;
+  });
 
   const activeTitle =
     navItems.find((item) => item.value === activeFilter)?.label || "Currently Watching";
+
+  const handleAddShow = (newShow) => {
+    setShows((prevShows) => [newShow, ...prevShows]);
+    setActiveFilter(newShow.status);
+  };
 
   return (
     <div className="app">
@@ -93,16 +108,33 @@ function App() {
         navItems={navItems}
         activeFilter={activeFilter}
         onFilterChange={setActiveFilter}
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
       />
 
       <main className="content">
-        <h1>{activeTitle}</h1>
+        <div className="toolbar">
+          <h1>{activeTitle}</h1>
+        </div>
+
+
         <div className="shows-grid">
           {filteredShows.map((show) => (
             <ShowCard key={show.id} show={show} />
           ))}
         </div>
       </main>
+
+      <button className="add-show-button" onClick={() => setIsModalOpen(true)}>
+        + Add Show
+      </button>
+
+      <AddShowModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSubmit={handleAddShow}
+        statusOptions={navItems.filter((item) => item.value !== "ALL")}
+      />
     </div>
   );
 }
