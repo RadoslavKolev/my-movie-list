@@ -1,4 +1,17 @@
+import { useState } from "react";
+
+// Components
 import ShowCard from "./components/ShowCard/ShowCard";
+import Navigation from "./components/Navigation/Navigation";
+
+const navItems = [
+  { value: "ALL", label: "All Shows" },
+  { value: "CURRENTLY WATCHING", label: "Currently Watching" },
+  { value: "COMPLETED", label: "Completed" },
+  { value: "ON HOLD", label: "On Hold" },
+  { value: "DROPPED", label: "Dropped" },
+  { value: "PLAN TO WATCH", label: "Plan to Watch" },
+];
 
 // Dummy data for testing
 const shows = [
@@ -11,6 +24,7 @@ const shows = [
     episodesWatched: 32,
     totalEpisodes: 62,
     type: "TV",
+    status: "CURRENTLY WATCHING",
   },
 
   {
@@ -22,6 +36,7 @@ const shows = [
     episodesWatched: 20,
     totalEpisodes: 63,
     type: "TV",
+    status: "CURRENTLY WATCHING",
   },
 
   {
@@ -33,6 +48,7 @@ const shows = [
     episodesWatched: 5,
     totalEpisodes: 9,
     type: "TV",
+    status: "PLAN TO WATCH",
   },
 
   {
@@ -44,6 +60,7 @@ const shows = [
     episodesWatched: 12,
     totalEpisodes: 34,
     type: "TV",
+    status: "ON HOLD",
   },
 
   {
@@ -55,37 +72,34 @@ const shows = [
     episodesWatched: 73,
     totalEpisodes: 73,
     type: "TV",
+    status: "COMPLETED",
   },
 ];
 
 function App() {
+  const [activeFilter, setActiveFilter] = useState("CURRENTLY WATCHING");
+
+  const filteredShows =
+    activeFilter === "ALL"
+      ? shows
+      : shows.filter((show) => show.status === activeFilter);
+
+  const activeTitle =
+    navItems.find((item) => item.value === activeFilter)?.label || "Currently Watching";
+
   return (
     <div className="app">
-      <header className="navbar">
-        <div className="navbar-content">
-          <div className="logo">
-            MyMovie<span>List</span>
-          </div>
-
-          <nav className="navigation">
-            <button>ALL</button>
-            <button className="active">CURRENTLY WATCHING</button>
-            <button>COMPLETED</button>
-            <button>ON HOLD</button>
-            <button>DROPPED</button>
-            <button>PLAN TO WATCH</button>
-          </nav>
-        </div>
-      </header>
+      <Navigation
+        navItems={navItems}
+        activeFilter={activeFilter}
+        onFilterChange={setActiveFilter}
+      />
 
       <main className="content">
-        <h1>Currently Watching</h1>
+        <h1>{activeTitle}</h1>
         <div className="shows-grid">
-          {shows.map((show) => (
-            <ShowCard
-              key={show.id}
-              show={show}
-            />
+          {filteredShows.map((show) => (
+            <ShowCard key={show.id} show={show} />
           ))}
         </div>
       </main>
