@@ -234,12 +234,6 @@ function App() {
         navItems={navItems}
         activeFilter={activeFilter}
         onFilterChange={setActiveFilter}
-        searchQuery={navSearch}
-        onSearchChange={setNavSearch}
-        searchResults={searchResults}
-        isSearching={isSearching}
-        onSelectResult={handleSelectResult}
-        tmdbAvailable={tmdbAvailable}
         user={session?.user || null}
         onLogout={handleLogout}
       />

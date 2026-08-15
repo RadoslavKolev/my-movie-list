@@ -73,58 +73,5 @@
     .navbar-search {
       display: none;
     }
-
-    .user-profile {
-      display: flex;
-      align-items: center;
-      gap: 20px;
-      margin-left: 18px;
-      padding-left: 12px;
-      border-left: 1px solid rgba(255, 255, 255, 0.12);
-
-      .user-avatar {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 30px;
-        height: 30px;
-        border-radius: 50%;
-        background: linear-gradient(135deg, #18e5e7, #7c4dff);
-        color: #0b1220;
-        font-weight: 800;
-      }
-
-      .user-meta {
-        display: flex;
-        flex-direction: column;
-        line-height: 1.2;
-
-        .user-label {
-          color: #b9b0c6;
-          font-size: 0.62rem;
-          text-transform: uppercase;
-          letter-spacing: 0.08em;
-        }
-
-        .user-email {
-          color: #f5f3f9;
-          font-size: 0.73rem;
-          max-width: 160px;
-          overflow: hidden;
-          text-overflow: ellipsis;
-          white-space: nowrap;
-        }
-      }
-
-      .logout-button {
-        border: 1px solid rgba(255, 255, 255, 0.15);
-        background: rgba(255, 255, 255, 0.04);
-        color: #f4f0fa;
-        border-radius: 6px;
-        padding: 7px 10px;
-        font-size: 0.74rem;
-        cursor: pointer;
-      }
-    }
   }
 }
