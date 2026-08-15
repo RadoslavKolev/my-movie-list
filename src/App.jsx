@@ -79,13 +79,13 @@ function App() {
   useEffect(() => {
     const loadShows = async () => {
       if (!isSupabaseConfigured || !session) {
+        // Clear shows when no session
+        setShows([]);
         return;
       }
 
       const supabaseShows = await fetchShowsFromSupabase();
-      if (supabaseShows.length > 0) {
-        setShows(supabaseShows);
-      }
+      setShows(supabaseShows);
     };
 
     loadShows();
