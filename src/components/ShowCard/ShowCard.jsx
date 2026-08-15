@@ -2,7 +2,22 @@ import PropTypes from 'prop-types';
 import "./ShowCard.scss";
 
 function ShowCard({ show, onProgressChange, onClick }) {
-  const { id, poster, title, rating = 0, episodesWatched, totalEpisodes, type } = show;
+  const { id, poster, title, rating = 0, episodesWatched, totalEpisodes, type, status } = show;
+
+  const getProgressBarColor = (currentStatus) => {
+    switch (currentStatus) {
+      case "COMPLETED":
+        return "#3fcf7f";
+      case "ON HOLD":
+        return "#c79a00";
+      case "DROPPED":
+        return "#d63a3a";
+      default:
+        return "#18e5e7";
+    }
+  };
+
+  const progressBarColor = getProgressBarColor(status);
 
   return (
     <div className="show-card" onClick={onClick}>
@@ -13,7 +28,7 @@ function ShowCard({ show, onProgressChange, onClick }) {
           className="poster"
         />
         <div className="rating">
-          {rating > 0 ? rating : "N/A"}
+          {rating > 0 ? `★ ${rating}` : "N/A"}
         </div>
         <div className="hover-overlay">
           <div className="hover-info">
@@ -57,6 +72,7 @@ function ShowCard({ show, onProgressChange, onClick }) {
                     ? (episodesWatched / totalEpisodes) * 100
                     : 0
                     }%`,
+                  background: progressBarColor,
                 }}
               />
             </div>
@@ -81,6 +97,7 @@ ShowCard.propTypes = {
     episodesWatched: PropTypes.number.isRequired,
     totalEpisodes: PropTypes.number.isRequired,
     type: PropTypes.string.isRequired,
+    status: PropTypes.string,
   }).isRequired,
   onProgressChange: PropTypes.func.isRequired,
   onClick: PropTypes.func.isRequired,
