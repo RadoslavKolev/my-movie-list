@@ -133,6 +133,29 @@ function App() {
     setActiveFilter(newShow.status);
   };
 
+  const handleProgressChange = (showId, change) => {
+    setShows((prev) =>
+      prev.map((show) => {
+        if (show.id !== showId) {
+          return show;
+        }
+
+        const newProgress = Math.max(
+          0,
+          Math.min(
+            show.totalEpisodes,
+            show.episodesWatched + change
+          )
+        );
+
+        return {
+          ...show,
+          episodesWatched: newProgress,
+        };
+      })
+    );
+  };
+
   return (
     <div className="app">
       <Navigation
@@ -154,7 +177,11 @@ function App() {
 
         <div className="shows-grid">
           {filteredShows.map((show) => (
-            <ShowCard key={show.id} show={show} />
+            <ShowCard
+              key={show.id}
+              show={show}
+              onProgressChange={handleProgressChange}
+            />
           ))}
         </div>
       </main>

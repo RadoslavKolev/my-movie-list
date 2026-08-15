@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import "./ShowCard.scss";
 
-function ShowCard({ show }) {
+function ShowCard({ show, onProgressChange }) {
   const { poster, title, rating = 0, episodesWatched, totalEpisodes, type } = show;
 
   return (
@@ -20,11 +20,48 @@ function ShowCard({ show }) {
             <div className="progress-label">
               Progress
             </div>
-            <div className="progress">
-              {episodesWatched} / {totalEpisodes}
+            <div className="progress-controls">
+              <button
+                type="button"
+                className="progress-button"
+                disabled={show.episodesWatched <= 0}
+                onClick={(event) => {
+                  event.stopPropagation();
+                  onProgressChange(show.id, -1);
+                }}
+              >
+                −
+              </button>
+
+              <div className="progress-count">
+                {show.episodesWatched} / {show.totalEpisodes}
+              </div>
+
+              <button
+                type="button"
+                className="progress-button"
+                disabled={show.episodesWatched >= show.totalEpisodes}
+                onClick={(event) => {
+                  event.stopPropagation();
+                  onProgressChange(show.id, 1);
+                }}
+              >
+                +
+              </button>
+            </div>
+            <div className="progress-bar">
+              <div
+                className="progress-bar-fill"
+                style={{
+                  width: `${show.totalEpisodes > 0
+                    ? (show.episodesWatched / show.totalEpisodes) * 100
+                    : 0
+                    }%`,
+                }}
+              />
             </div>
             <div className="type">
-              {type}
+              {show.type}
             </div>
           </div>
         </div>
@@ -32,7 +69,6 @@ function ShowCard({ show }) {
       <div className="show-title">
         {title}
       </div>
-
     </div>
   );
 }

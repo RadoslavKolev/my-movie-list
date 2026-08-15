@@ -1,6 +1,6 @@
 .show-card {
   min-width: 0;
-  
+
   .poster-container {
     position: relative;
     width: 100%;
@@ -47,22 +47,80 @@
         width: 100%;
         padding: 15px;
         color: white;
-      
+
         .progress-label {
           font-size: 12px;
           font-style: italic;
           margin-bottom: 3px;
         }
-      
+
         .progress {
           font-size: 17px;
           font-weight: bold;
         }
-      
+
         .type {
           margin-top: 4px;
           font-size: 12px;
           color: #d4d8e2;
+        }
+
+        .progress-controls {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 12px;
+          margin-top: 8px;
+
+          .progress-button {
+            width: 26px;
+            height: 26px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid rgba(255, 255, 255, 0.35);
+            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.08);
+            color: #ffffff;
+            font-size: 18px;
+            line-height: 1;
+            cursor: pointer;
+            transition:
+              background 0.15s ease,
+              border-color 0.15s ease;
+
+            &:hover {
+              background: rgba(255, 255, 255, 0.2);
+              border-color: rgba(255, 255, 255, 0.7);
+            }
+
+            &:disabled {
+              opacity: 0.3;
+              cursor: not-allowed;
+            }
+          }
+
+          .progress-count {
+            min-width: 55px;
+            text-align: center;
+            color: #ffffff;
+            font-size: 15px;
+            font-weight: bold;
+          }
+        }
+
+        .progress-bar {
+          width: 100%;
+          height: 4px;
+          margin-top: 10px;
+          overflow: hidden;
+          background: rgba(255, 255, 255, 0.2);
+
+          .progress-bar-fill {
+            height: 100%;
+            background: #18e5e7;
+            transition: width 0.2s ease;
+          }
         }
       }
     }
@@ -70,15 +128,14 @@
     &:hover .hover-overlay {
       opacity: 1;
     }
-    
-    .show-title {
-      margin-top: 10px;
-      text-align: center;
-      color: #d3d5de;
-      font-size: 1.25rem;
-      font-weight: bold;
-      line-height: 1.3;
-    }
   }
 
+  .show-title {
+    margin-top: 10px;
+    text-align: center;
+    color: #d3d5de;
+    font-size: 1.25rem;
+    font-weight: bold;
+    line-height: 1.3;
+  }
 }
