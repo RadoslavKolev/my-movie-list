@@ -11,6 +11,8 @@ function Navigation({
   searchResults = [],
   isSearching = false,
   onSelectResult,
+  user,
+  onLogout,
 }) {
   const hasTmdbKey = Boolean(import.meta.env.VITE_TMDB_API_KEY);
   const shouldShowNoResults =
@@ -35,66 +37,22 @@ function Navigation({
           ))}
         </nav>
 
-        <div className="navbar-search" role="search">
-          <span className="search-icon" aria-hidden="true">
-            ⌕
-          </span>
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(event) => onSearchChange(event.target.value)}
-            placeholder="Search TMDB..."
-            aria-label="Search shows"
-            autoComplete="off"
-          />
-
-          {searchResults?.length > 0 && (
-            <ul className="search-results">
-              {searchResults.map((r) => (
-                <li key={r.id} className="search-result-item">
-                  <button
-                    type="button"
-                    className="search-result-button"
-                    onClick={() => onSelectResult?.(r)}
-                  >
-                    <img
-                      src={buildTmdbPosterPath(r.poster_path)}
-                      alt={r.title}
-                      className="result-poster"
-                    />
-                    <div className="result-copy">
-                      <div className="result-title-row">
-                        <span className="result-title">{r.title}</span>
-                        <span className="result-rating">
-                          {r.vote_average > 0 ? `★ ${r.vote_average.toFixed(1)}` : "N/A"}
-                        </span>
-                      </div>
-
-                      <div className="result-meta-row">
-                        <span className="result-type">
-                          {r.media_type?.toUpperCase() || "TV"}
-                        </span>
-                        <span className="result-date">
-                          {r.date ? new Date(r.date).getFullYear() : "Unknown"}
-                        </span>
-                      </div>
-                    </div>
-                  </button>
-                </li>
-              ))}
-            </ul>
-          )}
-
-          {shouldShowNoResults && (
-            <div className="search-empty">
-              {hasTmdbKey ? (
-                <div className="no-results">No results found.</div>
-              ) : (
-                <div className="no-key">TMDB API key not configured.</div>
-              )}
+        {user && (
+          <div className="user-profile">
+            <div className="user-avatar" aria-hidden="true">
+              {user.email?.charAt(0)?.toUpperCase() || "U"}
             </div>
-          )}
-        </div>
+
+            <div className="user-meta">
+              <span className="user-label">Signed in</span>
+              <span className="user-email">{user.email}</span>
+            </div>
+
+            <button type="button" className="logout-button" onClick={onLogout}>
+              Log out
+            </button>
+          </div>
+        )}
       </div>
     </header>
   );
@@ -114,6 +72,10 @@ Navigation.propTypes = {
   searchResults: PropTypes.array,
   isSearching: PropTypes.bool,
   onSelectResult: PropTypes.func,
+  user: PropTypes.shape({
+    email: PropTypes.string,
+  }),
+  onLogout: PropTypes.func,
 };
 
 export default Navigation;

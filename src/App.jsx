@@ -5,9 +5,11 @@ import ShowCard from "./components/ShowCard/ShowCard";
 import Navigation from "./components/Navigation/Navigation";
 import ShowDetailsModal from "./components/ShowDetailsModal/ShowDetailsModal";
 import ShowCardInfoModal from "./components/ShowCardInfoModal/ShowCardInfoModal";
+import AuthPanel from "./components/AuthPanel/AuthPanel";
 
 // API calls
-import { searchTMDB, getTMDBDetails } from "./api/tmdb";
+import { searchTMDB, getTMDBDetails, buildTmdbPosterPath } from "./api/tmdb";
+import { fetchShowsFromSupabase, isSupabaseConfigured, supabase, syncShowsToSupabase } from "./lib/supabase";
 
 const navItems = [
   { value: "ALL", label: "All Shows" },
@@ -47,15 +49,57 @@ function App() {
   const [isSearching, setIsSearching] = useState(false);
   const [selectedTMDB, setSelectedTMDB] = useState(null);
   const [selectedShow, setSelectedShow] = useState(null);
+  const [session, setSession] = useState(null);
+  const [authRequired, setAuthRequired] = useState(Boolean(supabase));
+  const [authMessage, setAuthMessage] = useState("");
   const tmdbAvailable = Boolean(import.meta.env.VITE_TMDB_API_KEY);
   const searchTimer = useRef(null);
 
-  // Persist shows to localStorage whenever they change
+  useEffect(() => {
+    if (!supabase) {
+      setAuthRequired(false);
+      return;
+    }
+
+    supabase.auth.getSession().then(({ data }) => {
+      setSession(data.session);
+      setAuthRequired(!data.session);
+    });
+
+    const { data: authListener } = supabase.auth.onAuthStateChange((_event, nextSession) => {
+      setSession(nextSession);
+      setAuthRequired(!nextSession);
+    });
+
+    return () => {
+      authListener.subscription.unsubscribe();
+    };
+  }, []);
+
+  useEffect(() => {
+    const loadShows = async () => {
+      if (!isSupabaseConfigured || !session) {
+        return;
+      }
+
+      const supabaseShows = await fetchShowsFromSupabase();
+      if (supabaseShows.length > 0) {
+        setShows(supabaseShows);
+      }
+    };
+
+    loadShows();
+  }, [session]);
+
   useEffect(() => {
     if (typeof window !== "undefined") {
       window.localStorage.setItem(STORAGE_KEY, JSON.stringify(shows));
     }
-  }, [shows]);
+
+    if (isSupabaseConfigured && session) {
+      syncShowsToSupabase(shows);
+    }
+  }, [shows, session]);
 
   useEffect(() => {
     if (searchTimer.current) clearTimeout(searchTimer.current);
@@ -129,6 +173,61 @@ function App() {
     );
   };
 
+  const handleAuth = async ({ email, password, action }) => {
+    if (!supabase) {
+      return { error: { message: "Supabase is not configured yet." } };
+    }
+
+    setAuthMessage("");
+
+    if (action === "signUp") {
+      const response = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          emailRedirectTo:
+            typeof window !== "undefined" ? window.location.origin : undefined,
+        },
+      });
+
+      if (!response.error && response.data?.user && !response.data.user.email_confirmed_at) {
+        setAuthMessage("Check your email to verify your account before signing in.");
+      }
+
+      return response;
+    }
+
+    const response = await supabase.auth.signInWithPassword({ email, password });
+
+    if (!response.error && response.data?.user && !response.data.user.email_confirmed_at) {
+      setAuthMessage("Please verify your email before continuing.");
+    }
+
+    return response;
+  };
+
+  const handleLogout = async () => {
+    if (!supabase) {
+      setAuthRequired(false);
+      return;
+    }
+
+    await supabase.auth.signOut();
+    setSession(null);
+    setAuthRequired(true);
+    setAuthMessage("");
+  };
+
+  if (authRequired) {
+    return (
+      <AuthPanel
+        onAuthSuccess={handleAuth}
+        onCancel={() => setAuthRequired(false)}
+        statusMessage={authMessage}
+      />
+    );
+  }
+
   return (
     <div className="app">
       <Navigation
@@ -141,11 +240,74 @@ function App() {
         isSearching={isSearching}
         onSelectResult={handleSelectResult}
         tmdbAvailable={tmdbAvailable}
+        user={session?.user || null}
+        onLogout={handleLogout}
       />
 
       <main className="content">
         <div className="toolbar">
-          <h1>{activeTitle}</h1>
+          <div className="toolbar-title">{activeTitle}</div>
+
+          <div className="toolbar-search" role="search">
+            <span className="search-icon" aria-hidden="true">
+              ⌕
+            </span>
+            <input
+              type="text"
+              value={navSearch}
+              onChange={(event) => setNavSearch(event.target.value)}
+              placeholder="Search TMDB..."
+              aria-label="Search shows"
+              autoComplete="off"
+            />
+
+            {searchResults?.length > 0 && (
+              <ul className="search-results">
+                {searchResults.map((result) => (
+                  <li key={result.id} className="search-result-item">
+                    <button
+                      type="button"
+                      className="search-result-button"
+                      onClick={() => handleSelectResult(result)}
+                    >
+                      <img
+                        src={buildTmdbPosterPath(result.poster_path)}
+                        alt={result.title}
+                        className="result-poster"
+                      />
+                      <div className="result-copy">
+                        <div className="result-title-row">
+                          <span className="result-title">{result.title}</span>
+                          <span className="result-rating">
+                            {result.vote_average > 0 ? `★ ${result.vote_average.toFixed(1)}` : "N/A"}
+                          </span>
+                        </div>
+
+                        <div className="result-meta-row">
+                          <span className="result-type">
+                            {result.media_type?.toUpperCase() || "TV"}
+                          </span>
+                          <span className="result-date">
+                            {result.date ? new Date(result.date).getFullYear() : "Unknown"}
+                          </span>
+                        </div>
+                      </div>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
+
+            {navSearch?.trim() && !isSearching && searchResults.length === 0 && (
+              <div className="search-empty">
+                {tmdbAvailable ? (
+                  <div className="no-results">No results found.</div>
+                ) : (
+                  <div className="no-key">TMDB API key not configured.</div>
+                )}
+              </div>
+            )}
+          </div>
         </div>
 
         <div className="shows-grid">
