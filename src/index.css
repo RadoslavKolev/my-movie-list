@@ -34,7 +34,7 @@ button {
 .toolbar {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
   max-width: 1180px;
   margin: 0 auto 24px;
 }

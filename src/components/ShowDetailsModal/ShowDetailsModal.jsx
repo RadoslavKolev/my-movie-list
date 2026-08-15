@@ -19,7 +19,7 @@ function ShowDetailsModal({ item, isOpen, onClose, onAdd }) {
       id: `tmdb-${item.tmdbId}`,
       title: item.title,
       poster,
-      rating: Math.round((item.vote_average || 0) * 10) / 10,
+      rating: 0,
       episodesWatched: episodeDefaults.episodesWatched,
       totalEpisodes: episodeDefaults.totalEpisodes,
       type: item.media_type === "movie" ? "Movie" : "TV",

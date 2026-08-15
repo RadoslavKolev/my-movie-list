@@ -1,11 +1,11 @@
 import PropTypes from 'prop-types';
 import "./ShowCard.scss";
 
-function ShowCard({ show, onProgressChange }) {
-  const { poster, title, rating = 0, episodesWatched, totalEpisodes, type } = show;
+function ShowCard({ show, onProgressChange, onClick }) {
+  const { id, poster, title, rating = 0, episodesWatched, totalEpisodes, type } = show;
 
   return (
-    <div className="show-card">
+    <div className="show-card" onClick={onClick}>
       <div className="poster-container">
         <img
           src={poster}
@@ -24,26 +24,26 @@ function ShowCard({ show, onProgressChange }) {
               <button
                 type="button"
                 className="progress-button"
-                disabled={show.episodesWatched <= 0}
+                disabled={episodesWatched <= 0}
                 onClick={(event) => {
                   event.stopPropagation();
-                  onProgressChange(show.id, -1);
+                  onProgressChange(id, -1);
                 }}
               >
                 −
               </button>
 
               <div className="progress-count">
-                {show.episodesWatched} / {show.totalEpisodes}
+                {episodesWatched} / {totalEpisodes}
               </div>
 
               <button
                 type="button"
                 className="progress-button"
-                disabled={show.episodesWatched >= show.totalEpisodes}
+                disabled={episodesWatched >= totalEpisodes}
                 onClick={(event) => {
                   event.stopPropagation();
-                  onProgressChange(show.id, 1);
+                  onProgressChange(id, 1);
                 }}
               >
                 +
@@ -53,15 +53,15 @@ function ShowCard({ show, onProgressChange }) {
               <div
                 className="progress-bar-fill"
                 style={{
-                  width: `${show.totalEpisodes > 0
-                    ? (show.episodesWatched / show.totalEpisodes) * 100
+                  width: `${totalEpisodes > 0
+                    ? (episodesWatched / totalEpisodes) * 100
                     : 0
                     }%`,
                 }}
               />
             </div>
             <div className="type">
-              {show.type}
+              {type}
             </div>
           </div>
         </div>
@@ -82,6 +82,8 @@ ShowCard.propTypes = {
     totalEpisodes: PropTypes.number.isRequired,
     type: PropTypes.string.isRequired,
   }).isRequired,
+  onProgressChange: PropTypes.func.isRequired,
+  onClick: PropTypes.func.isRequired,
 };
 
 export default ShowCard;
