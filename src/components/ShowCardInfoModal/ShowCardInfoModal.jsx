@@ -3,18 +3,18 @@ import { useState } from "react";
 import "./ShowCardInfoModal.scss";
 
 const statusOptions = [
-  "Currently Watching",
-  "Completed",
-  "On Hold",
-  "Dropped",
-  "Plan to Watch",
+  "CURRENTLY WATCHING",
+  "COMPLETED",
+  "ON HOLD",
+  "DROPPED",
+  "PLAN TO WATCH",
 ];
 
 function ShowCardInfoModal({ show, onClose, onSave }) {
   const [formState, setFormState] = useState(() => ({
     title: show?.title || "",
     rating: show?.rating ?? 0,
-    status: show?.status || "Plan to Watch",
+    status: show?.status || "PLAN TO WATCH",
     episodesWatched: show?.episodesWatched ?? 0,
     totalEpisodes: show?.totalEpisodes ?? 1,
     type: show?.type || "TV",

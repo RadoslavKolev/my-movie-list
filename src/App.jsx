@@ -18,8 +18,29 @@ const navItems = [
   { value: "PLAN TO WATCH", label: "Plan to Watch" },
 ];
 
+const STORAGE_KEY = "my-movie-list-shows";
+
+const getInitialShows = () => {
+  if (typeof window === "undefined") {
+    return [];
+  }
+
+  try {
+    const savedShows = window.localStorage.getItem(STORAGE_KEY);
+    if (!savedShows) {
+      return [];
+    }
+
+    const parsedShows = JSON.parse(savedShows);
+    return Array.isArray(parsedShows) ? parsedShows : [];
+  } catch (error) {
+    console.error("Failed to load saved shows", error);
+    return [];
+  }
+};
+
 function App() {
-  const [shows, setShows] = useState([]);
+  const [shows, setShows] = useState(getInitialShows);
   const [activeFilter, setActiveFilter] = useState("CURRENTLY WATCHING");
   const [navSearch, setNavSearch] = useState("");
   const [searchResults, setSearchResults] = useState([]);
@@ -28,6 +49,13 @@ function App() {
   const [selectedShow, setSelectedShow] = useState(null);
   const tmdbAvailable = Boolean(import.meta.env.VITE_TMDB_API_KEY);
   const searchTimer = useRef(null);
+
+  // Persist shows to localStorage whenever they change
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(shows));
+    }
+  }, [shows]);
 
   useEffect(() => {
     if (searchTimer.current) clearTimeout(searchTimer.current);
