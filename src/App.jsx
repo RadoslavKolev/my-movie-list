@@ -3,8 +3,9 @@ import { useState, useEffect, useRef } from "react";
 // Components
 import ShowCard from "./components/ShowCard/ShowCard";
 import Navigation from "./components/Navigation/Navigation";
-import AddShowModal from "./components/AddShowModal/AddShowModal";
 import ShowDetailsModal from "./components/ShowDetailsModal/ShowDetailsModal";
+
+// API calls
 import { searchTMDB, getTMDBDetails } from "./api/tmdb";
 
 const navItems = [
@@ -86,7 +87,6 @@ function App() {
   const [searchResults, setSearchResults] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
   const tmdbAvailable = Boolean(import.meta.env.VITE_TMDB_API_KEY);
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedTMDB, setSelectedTMDB] = useState(null);
   const searchTimer = useRef(null);
 
@@ -118,11 +118,6 @@ function App() {
 
   const activeTitle =
     navItems.find((item) => item.value === activeFilter)?.label || "Currently Watching";
-
-  const handleAddShow = (newShow) => {
-    setShows((prevShows) => [newShow, ...prevShows]);
-    setActiveFilter(newShow.status);
-  };
 
   const handleSelectResult = async (item) => {
     const enriched = await getTMDBDetails(item.media_type, item.tmdbId);
@@ -163,17 +158,6 @@ function App() {
           ))}
         </div>
       </main>
-
-      <button className="add-show-button" onClick={() => setIsModalOpen(true)}>
-        + Add Show
-      </button>
-
-      <AddShowModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        onSubmit={handleAddShow}
-        statusOptions={navItems.filter((item) => item.value !== "ALL")}
-      />
 
       <ShowDetailsModal
         item={selectedTMDB}
