@@ -1,6 +1,7 @@
 import PropTypes from "prop-types";
 import { useState } from "react";
 import "./ShowDetailsModal.scss";
+import { getEpisodeDefaults } from "../../utils/episodes";
 
 function ShowDetailsModal({ item, isOpen, onClose, onAdd }) {
   const [status, setStatus] = useState("PLAN TO WATCH");
@@ -12,13 +13,15 @@ function ShowDetailsModal({ item, isOpen, onClose, onAdd }) {
     : "https://placehold.co/500x750/1b0034/ffffff?text=No+Image";
 
   const handleAdd = () => {
+    const episodeDefaults = getEpisodeDefaults(item, status);
+
     const newShow = {
       id: `tmdb-${item.tmdbId}`,
       title: item.title,
       poster,
       rating: Math.round((item.vote_average || 0) * 10) / 10,
-      episodesWatched: status === "COMPLETED" ? item.totalEpisodes : 0,
-      totalEpisodes: item.totalEpisodes || 0,
+      episodesWatched: episodeDefaults.episodesWatched,
+      totalEpisodes: episodeDefaults.totalEpisodes,
       type: item.media_type === "movie" ? "Movie" : "TV",
       status,
     };
