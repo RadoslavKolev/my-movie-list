@@ -1,4 +1,5 @@
-// import PropTypes from 'prop-types';
+import PropTypes from 'prop-types';
+import "./ShowCard.scss";
 
 function ShowCard({ show }) {
   const { poster, title, rating = 0, episodesWatched, totalEpisodes, type } = show;
@@ -36,15 +37,15 @@ function ShowCard({ show }) {
   );
 }
 
-// ShowCard.propTypes = {
-//   show: PropTypes.shape({
-//     poster: PropTypes.string.isRequired,
-//     title: PropTypes.string.isRequired,
-//     rating: PropTypes.number,
-//     episodesWatched: PropTypes.number.isRequired,
-//     totalEpisodes: PropTypes.number.isRequired,
-//     type: PropTypes.string.isRequired,
-//   }).isRequired,
-// };
+ShowCard.propTypes = {
+  show: PropTypes.shape({
+    poster: PropTypes.string.isRequired,
+    title: PropTypes.string.isRequired,
+    rating: PropTypes.number,
+    episodesWatched: PropTypes.number.isRequired,
+    totalEpisodes: PropTypes.number.isRequired,
+    type: PropTypes.string.isRequired,
+  }).isRequired,
+};
 
 export default ShowCard;
