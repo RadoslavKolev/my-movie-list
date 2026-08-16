@@ -31,10 +31,25 @@ function ShowCardInfoModal({ show, onClose, onSave }) {
 
   if (!show) return null;
 
+  const getProgressBarColor = (currentStatus) => {
+    switch (currentStatus) {
+      case "COMPLETED":
+        return "#3fcf7f";
+      case "ON HOLD":
+        return "#c79a00";
+      case "DROPPED":
+        return "#d63a3a";
+      default:
+        return "#18e5e7";
+    }
+  };
+
   const progressPercent =
     formState.totalEpisodes > 0
       ? (formState.episodesWatched / formState.totalEpisodes) * 100
       : 0;
+
+  const progressBarColor = getProgressBarColor(formState.status);
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -163,7 +178,13 @@ function ShowCardInfoModal({ show, onClose, onSave }) {
           </div>
 
           <div className="progress-bar">
-            <div className="progress-bar__fill" style={{ width: `${progressPercent}%` }} />
+            <div
+              className="progress-bar__fill"
+              style={{
+                width: `${progressPercent}%`,
+                background: progressBarColor,
+              }}
+            />
           </div>
 
           <div className="overview-block">
