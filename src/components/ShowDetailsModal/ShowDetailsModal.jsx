@@ -3,10 +3,15 @@ import { useState } from "react";
 import "./ShowDetailsModal.scss";
 import { getEpisodeDefaults } from "../../utils/episodes";
 
-function ShowDetailsModal({ item, isOpen, onClose, onAdd }) {
+function ShowDetailsModal({ item, isOpen, onClose, onAdd, existingShows = [] }) {
   const [status, setStatus] = useState("PLAN TO WATCH");
 
   if (!isOpen || !item) return null;
+
+  // Check if show already exists
+  const isAlreadyAdded = existingShows.some(
+    (show) => show.id === `tmdb-${item.tmdbId}`
+  );
 
   const poster = item.poster_path
     ? `https://image.tmdb.org/t/p/w500${item.poster_path}`
@@ -55,7 +60,13 @@ function ShowDetailsModal({ item, isOpen, onClose, onAdd }) {
             </label>
 
             <div className="details-actions">
-              <button className="primary" onClick={handleAdd}>Add Show</button>
+              <button 
+                className="primary" 
+                onClick={handleAdd}
+                disabled={isAlreadyAdded}
+              >
+                {isAlreadyAdded ? "Already Added" : "Add Show"}
+              </button>
               <button className="secondary" onClick={onClose}>Close</button>
             </div>
           </div>
@@ -70,6 +81,7 @@ ShowDetailsModal.propTypes = {
   isOpen: PropTypes.bool.isRequired,
   onClose: PropTypes.func.isRequired,
   onAdd: PropTypes.func.isRequired,
+  existingShows: PropTypes.arrayOf(PropTypes.object),
 };
 
 export default ShowDetailsModal;

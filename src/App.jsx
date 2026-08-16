@@ -44,6 +44,7 @@ const getInitialShows = () => {
 function App() {
   const [shows, setShows] = useState(getInitialShows);
   const [activeFilter, setActiveFilter] = useState("CURRENTLY WATCHING");
+  const [sortBy, setSortBy] = useState("name");
   const [navSearch, setNavSearch] = useState("");
   const [searchResults, setSearchResults] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
@@ -122,10 +123,19 @@ function App() {
     return () => clearTimeout(searchTimer.current);
   }, [navSearch]);
 
-  const filteredShows = shows.filter((show) => {
-    const matchesStatus = activeFilter === "ALL" ? true : show.status === activeFilter;
-    return matchesStatus;
-  });
+  const filteredShows = shows
+    .filter((show) => {
+      const matchesStatus = activeFilter === "ALL" ? true : show.status === activeFilter;
+      return matchesStatus;
+    })
+    .sort((a, b) => {
+      if (sortBy === "name") {
+        return a.title.localeCompare(b.title);
+      } else if (sortBy === "score") {
+        return b.rating - a.rating;
+      }
+      return 0;
+    });
 
   const activeTitle =
     navItems.find((item) => item.value === activeFilter)?.label || "Currently Watching";
@@ -242,6 +252,18 @@ function App() {
         <div className="toolbar">
           <div className="toolbar-title">{activeTitle}</div>
 
+          <div className="toolbar-controls">
+            <select
+              className="sort-select"
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value)}
+              aria-label="Sort shows by"
+            >
+              <option value="name">Sort: Name</option>
+              <option value="score">Sort: Score</option>
+            </select>
+          </div>
+
           <div className="toolbar-search" role="search">
             <span className="search-icon" aria-hidden="true">
               ⌕
@@ -321,6 +343,7 @@ function App() {
         isOpen={!!selectedTMDB}
         onClose={() => setSelectedTMDB(null)}
         onAdd={handleAddFromTMDB}
+        existingShows={shows}
       />
 
       {selectedShow && (
