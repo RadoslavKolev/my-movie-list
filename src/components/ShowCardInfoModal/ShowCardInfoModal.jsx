@@ -1,5 +1,5 @@
 import PropTypes from "prop-types";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "./ShowCardInfoModal.scss";
 
 const statusOptions = [
@@ -19,6 +19,15 @@ function ShowCardInfoModal({ show, onClose, onSave }) {
     totalEpisodes: show?.totalEpisodes ?? 1,
     type: show?.type || "TV",
   }));
+
+  useEffect(() => {
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, []);
 
   if (!show) return null;
 

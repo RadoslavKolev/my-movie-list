@@ -2,6 +2,10 @@
   box-sizing: border-box;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 body {
   margin: 0;
   background: #0b1428;
@@ -9,8 +13,13 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
-button {
+button,
+input {
   font-family: inherit;
+}
+
+img {
+  max-width: 100%;
 }
 
 .app {
@@ -19,16 +28,10 @@ button {
 
 .content {
   position: relative;
+  max-width: 1440px;
   text-align: center;
   margin: 0 auto;
-  padding: 35px 18px;
-}
-
-.content h1 {
-  margin: 0;
-  color: #ffffff;
-  font-size: 2rem;
-  font-weight: bold;
+  padding: 35px 18px 50px;
 }
 
 .toolbar {
@@ -36,6 +39,7 @@ button {
   display: flex;
   align-items: center;
   justify-content: center;
+  max-width: 1440px;
   margin: 0 auto 24px;
   min-height: 52px;
 }
@@ -43,7 +47,7 @@ button {
 .toolbar-title {
   margin: 0;
   color: #ffffff;
-  font-size: 2rem;
+  font-size: clamp(1.6rem, 2vw, 2.5rem);
   font-weight: bold;
   text-align: center;
 }
@@ -191,7 +195,86 @@ button {
 
 .shows-grid {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 28px;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: clamp(16px, 2vw, 28px);
   margin-top: 30px;
+}
+
+@media (max-width: 1280px) {
+  .shows-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 980px) {
+  .toolbar {
+    min-height: auto;
+    margin-bottom: 18px;
+  }
+
+  .toolbar-title {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    width: calc(100% - 220px);
+  }
+
+  .shows-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 760px) {
+  .content {
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+
+  .toolbar {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .toolbar-title {
+    position: static;
+    transform: none;
+    width: auto;
+  }
+
+  .toolbar-search {
+    position: relative;
+    width: min(100%, 360px);
+  }
+
+  .shows-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+  }
+}
+
+@media (max-width: 520px) {
+  .content {
+    padding-top: 18px;
+  }
+
+  .toolbar-search {
+    width: 100%;
+  }
+
+  .toolbar-search input {
+    width: 100%;
+  }
+
+  .toolbar-search .search-results,
+  .toolbar-search .search-empty {
+    width: min(100vw - 24px, 360px);
+  }
+
+  .shows-grid {
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
 }

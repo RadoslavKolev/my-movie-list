@@ -1,4 +1,5 @@
 import PropTypes from "prop-types";
+import { useState } from "react";
 import "./Navigation.scss";
 import Profile from "../Profile/Profile";
 
@@ -9,6 +10,12 @@ function Navigation({
   user,
   onLogout,
 }) {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  const handleFilterSelect = (value) => {
+    onFilterChange(value);
+    setIsMenuOpen(false);
+  };
 
   return (
     <header className="navbar">
@@ -17,13 +24,25 @@ function Navigation({
           MyMovie<span>List</span>
         </div>
 
-        <nav className="navigation">
+        <button
+          type="button"
+          className="mobile-menu-toggle"
+          onClick={() => setIsMenuOpen((prev) => !prev)}
+          aria-label="Toggle navigation menu"
+          aria-expanded={isMenuOpen}
+        >
+          <span />
+          <span />
+          <span />
+        </button>
+
+        <nav className={`navigation ${isMenuOpen ? "open" : ""}`}>
           {navItems.map((item) => (
             <button
               type="button"
               key={item.value}
               className={item.value === activeFilter ? "active" : ""}
-              onClick={() => onFilterChange(item.value)}
+              onClick={() => handleFilterSelect(item.value)}
             >
               {item.value}
             </button>

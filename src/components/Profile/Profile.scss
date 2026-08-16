@@ -5,6 +5,7 @@
   margin-left: 18px;
   padding-left: 12px;
   border-left: 1px solid rgba(255, 255, 255, 0.12);
+  flex-shrink: 0;
 
   .profile-avatar {
     display: flex;
@@ -67,6 +68,32 @@
 
     &:active {
       transform: scale(0.95);
+    }
+  }
+}
+
+@media (max-width: 980px) {
+  .profile-panel {
+    width: 100%;
+    justify-content: center;
+    margin-left: 0;
+    padding-left: 0;
+    border-left: none;
+    border-top: 1px solid rgba(255, 255, 255, 0.12);
+    padding-top: 10px;
+  }
+}
+
+@media (max-width: 520px) {
+  .profile-panel {
+    gap: 10px;
+
+    .profile-meta {
+      min-width: 0;
+    }
+
+    .profile-email {
+      max-width: 130px;
     }
   }
 }

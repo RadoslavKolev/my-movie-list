@@ -134,8 +134,22 @@
     margin-top: 10px;
     text-align: center;
     color: #d3d5de;
-    font-size: 1.25rem;
+    font-size: clamp(0.95rem, 1.2vw, 1rem);
     font-weight: bold;
     line-height: 1.3;
+  }
+}
+
+@media (max-width: 520px) {
+  .show-card {
+    .poster-container {
+      .hover-overlay {
+        display: none;
+      }
+    }
+
+    .show-title {
+      font-size: 0.95rem;
+    }
   }
 }
