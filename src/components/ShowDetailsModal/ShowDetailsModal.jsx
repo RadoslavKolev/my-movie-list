@@ -4,7 +4,6 @@ import "./ShowDetailsModal.scss";
 import { getEpisodeDefaults } from "../../utils/episodes";
 
 function ShowDetailsModal({ item, isOpen, onClose, onAdd, existingShows = [] }) {
-  console.log(item)
   const [status, setStatus] = useState("PLAN TO WATCH");
 
   if (!isOpen || !item) return null;

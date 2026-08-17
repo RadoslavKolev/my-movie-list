@@ -20,8 +20,6 @@ function ShowCardInfoModal({ show, onClose, onSave }) {
     type: show?.type || "TV",
   }));
 
-  console.log(show);
-
   useEffect(() => {
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
