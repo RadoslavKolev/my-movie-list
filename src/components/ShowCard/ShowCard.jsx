@@ -87,7 +87,7 @@ function ShowCard({ show, onProgressChange, onClick }) {
         </div>
       </div>
       <div className="show-title">
-        {name.startsWith(show.showName) ? name : `${show.showName}: ${name}`}
+        {name}
       </div>
     </div>
   );

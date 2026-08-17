@@ -12,11 +12,11 @@ const statusOptions = [
 
 function ShowCardInfoModal({ show, onClose, onSave }) {
   const [formState, setFormState] = useState(() => ({
-    title: show?.title || "",
+    name: show?.name || "",
     rating: show?.rating ?? 0,
     status: show?.status || "PLAN TO WATCH",
     episodesWatched: show?.episodesWatched ?? 0,
-    totalEpisodes: show?.totalEpisodes ?? 1,
+    totalEpisodes: show?.episode_count ?? 1,
     type: show?.type || "TV",
   }));
 
@@ -43,6 +43,10 @@ function ShowCardInfoModal({ show, onClose, onSave }) {
         return "#18e5e7";
     }
   };
+
+  const poster = show.poster_path
+    ? `https://image.tmdb.org/t/p/w500${show.poster_path}`
+    : "https://placehold.co/500x750/1b0034/ffffff?text=No+Image";
 
   const progressPercent =
     formState.totalEpisodes > 0
@@ -126,14 +130,14 @@ function ShowCardInfoModal({ show, onClose, onSave }) {
         </button>
 
         <div className="modal-poster-wrap">
-          <img src={show.poster} alt={show.title} className="modal-poster" />
+          <img src={poster} alt={show.name} className="modal-poster" />
         </div>
 
         <div className="modal-content">
           <div className="modal-header-row">
             <div>
               <div className="modal-badge">{formState.type}</div>
-              <h2>{formState.title}</h2>
+              <h2>{formState.name}</h2>
             </div>
 
             <button type="button" className="rating-button">
@@ -190,8 +194,7 @@ function ShowCardInfoModal({ show, onClose, onSave }) {
           <div className="overview-block">
             <h3>Overview</h3>
             <p>
-              {show.overview ||
-                "A compelling story with memorable characters and a deeply engaging progression that keeps viewers invested from start to finish."}
+              {show.overview}
             </p>
           </div>
 

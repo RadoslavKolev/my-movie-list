@@ -43,6 +43,7 @@ const getInitialShows = () => {
 
 function App() {
   const [shows, setShows] = useState(getInitialShows);
+  const [cards, setCards] = useState([]);
   const [activeFilter, setActiveFilter] = useState("CURRENTLY WATCHING");
   const [sortBy, setSortBy] = useState("name");
   const [navSearch, setNavSearch] = useState("");
@@ -123,22 +124,31 @@ function App() {
     return () => clearTimeout(searchTimer.current);
   }, [navSearch]);
 
-  const cards = shows.flatMap(show =>
-    show.seasons.map(season => ({
+  const prepareShowName = (showName, seasonName, totalSeasons) => {
+    if (totalSeasons === 1) {
+      return showName;
+    }
+
+    return seasonName.startsWith(showName) ? seasonName : `${showName}: ${seasonName}`
+  }
+
+  useEffect(() => {
+    const newCards = shows.flatMap(show =>
+      show.seasons.map(season => ({
         ...season,
         type: show.type,
         status: show.status,
         showStatus: show.showStatus,
-        showName: show.title,
+        name: prepareShowName(show.title, season.name, show.seasons.length),
         rating: show.rating,
-        totalSeasons: show.seasons.length,
         episodesWatched: season.episodesWatched ?? 0,
-        overview: season.overview || show.overview
-    }))
-  );
+        overview: season.overview || show.overview,
+        genres: show.genres
+      }))
+    );
 
-  console.log("Shows: ", shows);
-  // console.log("Cards: ", cards);
+    setCards(newCards);
+  }, [shows]);
 
   const filteredShows = cards
     .filter((card) => {
@@ -147,14 +157,17 @@ function App() {
     })
     .sort((a, b) => {
       if (sortBy === "name") {
-        return a.showName.localeCompare(b.showName);
+        return a.name.localeCompare(b.name);
       } else if (sortBy === "score") {
         return b.rating - a.rating;
       }
       return 0;
     });
 
-    console.log(filteredShows)
+  // console.log("Shows: ", shows);
+  // console.log("Cards: ", cards);
+  console.log(filteredShows)
+  console.log(selectedShow)
 
   const activeTitle =
     navItems.find((item) => item.value === activeFilter)?.label || "Currently Watching";
@@ -174,13 +187,30 @@ function App() {
   };
 
   const handleProgressChange = (seasonId, change) => {
+    setCards(prev =>
+      prev.map(card => {
+        if (card.id !== seasonId) return card;
+
+        const newProgress = Math.max(
+          0,
+          Math.min(
+            card.episode_count,
+            (card.episodesWatched ?? 0) + change
+          )
+        );
+
+        return {
+          ...card,
+          episodesWatched: newProgress
+        };
+      })
+    );
+
     setShows(prev =>
       prev.map(show => ({
         ...show,
         seasons: show.seasons.map(season => {
-          if (season.id !== seasonId) {
-            return season;
-          }
+          if (season.id !== seasonId) return season;
 
           const newProgress = Math.max(
             0,
