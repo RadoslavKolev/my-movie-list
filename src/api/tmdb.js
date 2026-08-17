@@ -15,7 +15,7 @@ export function normalizeTmdbResult(result) {
     overview: result.overview || "",
     poster_path: result.poster_path || result.backdrop_path || null,
     vote_average: result.vote_average || 0,
-    date: result.first_air_date || result.release_date || "",
+    date: result.first_air_date || result.last_air_date || "",
     totalEpisodes: result.number_of_episodes ?? 0,
   };
 }
@@ -67,8 +67,15 @@ export async function getTMDBDetails(mediaType, tmdbId) {
       overview: data.overview || "",
       poster_path: data.poster_path || data.backdrop_path || null,
       vote_average: data.vote_average || 0,
-      date: data.first_air_date || data.release_date || "",
+      date: `${data.first_air_date} - ${data.last_air_date}`,
       totalEpisodes: data.number_of_episodes ?? 0,
+      totalSeasons: data.number_of_seasons ?? 1,
+      status: data.status || "",
+      seasons: Array.isArray(data.seasons)
+        ? data.seasons.filter(season => season.name !== "Specials") : [],
+      genres: Array.isArray(data.genres)
+        ? data.genres.map((genre) => ({ id: genre.id, name: genre.name }))
+        : [],
     };
   } catch (error) {
     console.error("TMDB details error:", error);

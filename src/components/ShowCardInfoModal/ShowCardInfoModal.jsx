@@ -144,7 +144,7 @@ function ShowCardInfoModal({ show, onClose, onSave }) {
           <div className="modal-meta-row">
             <span>{formState.type}</span>
             <span>•</span>
-            <span>{show.genre || "Drama"}</span>
+            <span>{show.genres?.join(", ")}</span>
             <span>•</span>
             <span>{formState.totalEpisodes} episodes</span>
           </div>
