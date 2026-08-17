@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import "./ShowCard.scss";
 
 function ShowCard({ show, onProgressChange, onClick }) {
-  const { id, poster, title, rating = 0, episodesWatched, totalEpisodes, type, status } = show;
+  const { id, poster_path, name, rating = 0, episodesWatched, episode_count, type, status } = show;
 
   const getProgressBarColor = (currentStatus) => {
     switch (currentStatus) {
@@ -17,6 +17,10 @@ function ShowCard({ show, onProgressChange, onClick }) {
     }
   };
 
+  const poster = poster_path
+    ? `https://image.tmdb.org/t/p/w500${poster_path}`
+    : "https://placehold.co/500x750/1b0034/ffffff?text=No+Image";
+
   const progressBarColor = getProgressBarColor(status);
 
   return (
@@ -24,7 +28,7 @@ function ShowCard({ show, onProgressChange, onClick }) {
       <div className="poster-container">
         <img
           src={poster}
-          alt={title}
+          alt={name}
           className="poster"
         />
         <div className="rating">
@@ -49,13 +53,13 @@ function ShowCard({ show, onProgressChange, onClick }) {
               </button>
 
               <div className="progress-count">
-                {episodesWatched} / {totalEpisodes}
+                {episodesWatched} / {episode_count}
               </div>
 
               <button
                 type="button"
                 className="progress-button"
-                disabled={episodesWatched >= totalEpisodes}
+                disabled={episodesWatched >= episode_count}
                 onClick={(event) => {
                   event.stopPropagation();
                   onProgressChange(id, 1);
@@ -68,8 +72,8 @@ function ShowCard({ show, onProgressChange, onClick }) {
               <div
                 className="progress-bar-fill"
                 style={{
-                  width: `${totalEpisodes > 0
-                    ? (episodesWatched / totalEpisodes) * 100
+                  width: `${episode_count > 0
+                    ? (episodesWatched / episode_count) * 100
                     : 0
                     }%`,
                   background: progressBarColor,
@@ -83,7 +87,7 @@ function ShowCard({ show, onProgressChange, onClick }) {
         </div>
       </div>
       <div className="show-title">
-        {title}
+        {name.startsWith(show.showName) ? name : `${show.showName}: ${name}`}
       </div>
     </div>
   );
@@ -95,7 +99,7 @@ ShowCard.propTypes = {
     title: PropTypes.string.isRequired,
     rating: PropTypes.number,
     episodesWatched: PropTypes.number.isRequired,
-    totalEpisodes: PropTypes.number.isRequired,
+    episode_count: PropTypes.number.isRequired,
     type: PropTypes.string.isRequired,
     status: PropTypes.string,
   }).isRequired,

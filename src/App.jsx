@@ -123,19 +123,38 @@ function App() {
     return () => clearTimeout(searchTimer.current);
   }, [navSearch]);
 
-  const filteredShows = shows
-    .filter((show) => {
-      const matchesStatus = activeFilter === "ALL" ? true : show.status === activeFilter;
+  const cards = shows.flatMap(show =>
+    show.seasons.map(season => ({
+        ...season,
+        type: show.type,
+        status: show.status,
+        showStatus: show.showStatus,
+        showName: show.title,
+        rating: show.rating,
+        totalSeasons: show.seasons.length,
+        episodesWatched: season.episodesWatched ?? 0,
+        overview: season.overview || show.overview
+    }))
+  );
+
+  console.log("Shows: ", shows);
+  // console.log("Cards: ", cards);
+
+  const filteredShows = cards
+    .filter((card) => {
+      const matchesStatus = activeFilter === "ALL" ? true : card.status === activeFilter;
       return matchesStatus;
     })
     .sort((a, b) => {
       if (sortBy === "name") {
-        return a.title.localeCompare(b.title);
+        return a.showName.localeCompare(b.showName);
       } else if (sortBy === "score") {
         return b.rating - a.rating;
       }
       return 0;
     });
+
+    console.log(filteredShows)
 
   const activeTitle =
     navItems.find((item) => item.value === activeFilter)?.label || "Currently Watching";
@@ -154,26 +173,29 @@ function App() {
     setActiveFilter(newShow.status);
   };
 
-  const handleProgressChange = (showId, change) => {
-    setShows((prev) =>
-      prev.map((show) => {
-        if (show.id !== showId) {
-          return show;
-        }
+  const handleProgressChange = (seasonId, change) => {
+    setShows(prev =>
+      prev.map(show => ({
+        ...show,
+        seasons: show.seasons.map(season => {
+          if (season.id !== seasonId) {
+            return season;
+          }
 
-        const newProgress = Math.max(
-          0,
-          Math.min(
-            show.totalEpisodes,
-            show.episodesWatched + change
-          )
-        );
+          const newProgress = Math.max(
+            0,
+            Math.min(
+              season.episode_count,
+              (season.episodesWatched ?? 0) + change
+            )
+          );
 
-        return {
-          ...show,
-          episodesWatched: newProgress,
-        };
-      })
+          return {
+            ...season,
+            episodesWatched: newProgress
+          };
+        })
+      }))
     );
   };
 
