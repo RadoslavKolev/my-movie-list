@@ -4,6 +4,7 @@ import "./ShowDetailsModal.scss";
 import { getEpisodeDefaults } from "../../utils/episodes";
 
 function ShowDetailsModal({ item, isOpen, onClose, onAdd, existingShows = [] }) {
+  console.log(item)
   const [status, setStatus] = useState("PLAN TO WATCH");
 
   if (!isOpen || !item) return null;
@@ -19,20 +20,42 @@ function ShowDetailsModal({ item, isOpen, onClose, onAdd, existingShows = [] }) 
 
   const handleAdd = () => {
     const episodeDefaults = getEpisodeDefaults(item, status);
+    const genres = item.genres?.map((genre) => genre.name) || [];
 
     const newShow = {
       id: `tmdb-${item.tmdbId}`,
       title: item.title,
       poster,
+      overview: item.overview,
+      showStatus: item.status,
+      genres,
+      seasons: item.seasons,
       rating: 0,
+      overallRating: item.vote_average,
       episodesWatched: episodeDefaults.episodesWatched,
       totalEpisodes: episodeDefaults.totalEpisodes,
       type: item.media_type === "movie" ? "Movie" : "TV",
       status,
+      airingPeriod: item.date,
     };
     onAdd(newShow);
     onClose();
   };
+
+  const formatMediaTypeAndGenre = (item) => {
+    const mediaType = item.media_type?.toUpperCase() || "";
+    const genres = item.genres?.map(genre => genre.name).join(", ") || "";
+
+    return `${mediaType} - ${genres}`;
+  };
+
+  const formatDateSeasonsAndStatus = (item) => {
+    const date = item.date || "";
+    const seasons = item.totalSeasons ?? 0;
+    const status = item.status || "";
+
+    return `Air Period: ${date} • Seasons: ${seasons} • Status: ${status}`;
+  }
 
   return (
     <div className="modal-overlay" onClick={onClose}>
@@ -45,7 +68,8 @@ function ShowDetailsModal({ item, isOpen, onClose, onAdd, existingShows = [] }) 
         <div className="details-body">
           <img src={poster} alt={item.title} className="details-poster" />
           <div className="details-info">
-            <div className="meta">{item.media_type.toUpperCase()} • {item.date}</div>
+            <div className="meta">{formatMediaTypeAndGenre(item)}</div>
+            <div className="meta">{formatDateSeasonsAndStatus(item)}</div>
             <div className="overview">{item.overview}</div>
 
             <label className="status-select">
