@@ -17,10 +17,9 @@ export function getEpisodeDefaults(item, status) {
   };
 }
 
-// A "Specials" season (season_number 0, or named "Specials") should never
-// get its own card. New shows are already filtered at fetch time
-// (see api/tmdb.js), but shows saved before that filter existed may still
-// have one stored, so we filter defensively here too.
+// A "Specials" season (season_number 0, or named "Specials") should never get its own card.
+// New shows are already filtered at fetch time,
+// but shows saved before that filter existed may still have one stored, so we filter defensively here too.
 function isSpecialSeason(season) {
   return season.season_number === 0 || /specials/i.test(season.name || "");
 }
@@ -34,13 +33,13 @@ export function sumTotalEpisodes(seasons) {
 }
 
 // Real (non-special) seasons for a show, sorted, each with its own
-// episodesWatched, status, and rating. Older saved shows only ever tracked
-// a single aggregate episodesWatched count, a single status, and a single
-// rating on the show itself, so for any season that doesn't yet have its
-// own value we backfill it: status and rating copy the show's old values,
-// and episodesWatched is "waterfalled" from the show's old aggregate
-// across seasons in order (fill season 1 first, then season 2, etc.) so
-// existing progress isn't lost the first time this runs.
+// episodesWatched and status. Older saved shows only ever tracked a single
+// aggregate episodesWatched count and a single status on the show itself,
+// so for any season that doesn't yet have its own value we backfill it:
+// status copies the show's old status, and episodesWatched is "waterfalled"
+// from the show's old aggregate across seasons in order (fill season 1
+// first, then season 2, etc.) so existing progress isn't lost the first
+// time this runs.
 export function getSeasonsWithProgress(show) {
   const seasons = (show.seasons || [])
     .filter((season) => !isSpecialSeason(season))
