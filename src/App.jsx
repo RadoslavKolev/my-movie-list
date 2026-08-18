@@ -10,6 +10,13 @@ import AuthPanel from "./components/AuthPanel/AuthPanel";
 // API calls
 import { searchTMDB, getTMDBDetails, buildTmdbPosterPath } from "./api/tmdb";
 import { fetchShowsFromSupabase, isSupabaseConfigured, supabase, syncShowsToSupabase } from "./lib/supabase";
+import {
+  buildShowCards,
+  getSeasonsWithProgress,
+  parseCardId,
+  sumEpisodesWatched,
+  sumTotalEpisodes,
+} from "./utils/episodes";
 
 const navItems = [
   { value: "ALL", label: "All Shows" },
@@ -123,9 +130,11 @@ function App() {
     return () => clearTimeout(searchTimer.current);
   }, [navSearch]);
 
-  const filteredShows = shows
-    .filter((show) => {
-      const matchesStatus = activeFilter === "ALL" ? true : show.status === activeFilter;
+  const cards = shows.flatMap(buildShowCards);
+
+  const filteredShows = cards
+    .filter((card) => {
+      const matchesStatus = activeFilter === "ALL" ? true : card.status === activeFilter;
       return matchesStatus;
     })
     .sort((a, b) => {
@@ -154,32 +163,92 @@ function App() {
     setActiveFilter(newShow.status);
   };
 
-  const handleProgressChange = (showId, change) => {
+  const handleProgressChange = (cardId, change) => {
+    const { showId, seasonNumber } = parseCardId(cardId);
+
     setShows((prev) =>
       prev.map((show) => {
         if (show.id !== showId) {
           return show;
         }
 
-        const newProgress = Math.max(
-          0,
-          Math.min(
-            show.totalEpisodes,
-            show.episodesWatched + change
-          )
-        );
+        if (seasonNumber === null) {
+          const newProgress = Math.max(
+            0,
+            Math.min(show.totalEpisodes, show.episodesWatched + change)
+          );
+
+          return { ...show, episodesWatched: newProgress };
+        }
+
+        const seasons = getSeasonsWithProgress(show).map((season) => {
+          if (season.season_number !== seasonNumber) return season;
+
+          const newProgress = Math.max(
+            0,
+            Math.min(season.episode_count ?? 0, (season.episodesWatched ?? 0) + change)
+          );
+
+          return { ...season, episodesWatched: newProgress };
+        });
 
         return {
           ...show,
-          episodesWatched: newProgress,
+          seasons,
+          episodesWatched: sumEpisodesWatched(seasons),
+          totalEpisodes: sumTotalEpisodes(seasons),
         };
       })
     );
   };
 
-  const handleUpdateShow = (updatedShow) => {
+  const handleUpdateShow = (updatedCard) => {
+    const { showId, seasonNumber } = parseCardId(updatedCard.id);
+
     setShows((prev) =>
-      prev.map((show) => (show.id === updatedShow.id ? { ...show, ...updatedShow } : show))
+      prev.map((show) => {
+        if (show.id !== showId) {
+          return show;
+        }
+
+        if (seasonNumber === null) {
+          // Movie or show without a season breakdown: status still lives
+          // on the show itself.
+          return {
+            ...show,
+            rating: Number(updatedCard.rating),
+            status: updatedCard.status,
+            type: updatedCard.type,
+            episodesWatched: Math.max(
+              0,
+              Math.min(updatedCard.totalEpisodes, Number(updatedCard.episodesWatched))
+            ),
+            totalEpisodes: Math.max(1, Number(updatedCard.totalEpisodes)),
+          };
+        }
+
+        const seasons = getSeasonsWithProgress(show).map((season) => {
+          if (season.season_number !== seasonNumber) return season;
+
+          return {
+            ...season,
+            status: updatedCard.status,
+            rating: Number(updatedCard.rating),
+            episodesWatched: Math.max(
+              0,
+              Math.min(season.episode_count ?? 0, Number(updatedCard.episodesWatched))
+            ),
+          };
+        });
+
+        return {
+          ...show,
+          type: updatedCard.type,
+          seasons,
+          episodesWatched: sumEpisodesWatched(seasons),
+          totalEpisodes: sumTotalEpisodes(seasons),
+        };
+      })
     );
   };
 

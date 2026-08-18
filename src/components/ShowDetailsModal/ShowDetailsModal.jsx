@@ -28,7 +28,7 @@ function ShowDetailsModal({ item, isOpen, onClose, onAdd, existingShows = [] }) 
       overview: item.overview,
       showStatus: item.status,
       genres,
-      seasons: item.seasons,
+      seasons: item.seasons?.map((season) => ({ ...season, status, rating: 0 })) || [],
       rating: 0,
       overallRating: item.vote_average,
       episodesWatched: episodeDefaults.episodesWatched,
