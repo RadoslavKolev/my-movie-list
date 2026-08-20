@@ -17,6 +17,37 @@ export function getEpisodeDefaults(item, status) {
   };
 }
 
+// Splits a date string ("2008-01-20") or a "start - end" range
+// ("2008-01-20 - 2013-09-29") into its year/month, using the start date.
+// Returns null when there's nothing usable to parse.
+function parseDateParts(dateStr) {
+  if (!dateStr) return null;
+  const [start] = dateStr.split(" - ");
+  const date = new Date(start);
+  if (Number.isNaN(date.getTime())) return null;
+  return { year: date.getFullYear(), month: date.getMonth() + 1 };
+}
+
+function getYear(dateStr) {
+  return parseDateParts(dateStr)?.year ?? null;
+}
+
+// Maps a calendar month (1-12) to the broadcast season it falls in:
+// Dec/Jan/Feb -> winter, Mar/Apr/May -> spring, Jun/Jul/Aug -> summer,
+// Sep/Oct/Nov -> autumn.
+export function getCalendarSeason(month) {
+  if (month === 12 || month === 1 || month === 2) return "winter";
+  if (month >= 3 && month <= 5) return "spring";
+  if (month >= 6 && month <= 8) return "summer";
+  if (month >= 9 && month <= 11) return "autumn";
+  return null;
+}
+
+function getSeasonLabel(dateStr) {
+  const parts = parseDateParts(dateStr);
+  return parts ? getCalendarSeason(parts.month) : null;
+}
+
 // A "Specials" season (season_number 0, or named "Specials") should never get its own card.
 // New shows are already filtered at fetch time,
 // but shows saved before that filter existed may still have one stored, so we filter defensively here too.
@@ -100,6 +131,8 @@ export function buildShowCards(show) {
         poster: show.poster,
         title: show.title,
         rating: show.rating,
+        year: getYear(show.airingPeriod),
+        season: getSeasonLabel(show.airingPeriod),
         episodesWatched: show.episodesWatched ?? 0,
         totalEpisodes: show.totalEpisodes ?? 0,
         type: show.type,
@@ -119,6 +152,8 @@ export function buildShowCards(show) {
     poster: season.poster_path ? buildTmdbPosterPath(season.poster_path) : show.poster,
     title: buildSeasonTitle(show.title, season.name, totalSeasons),
     rating: season.rating,
+    year: getYear(season.air_date) ?? getYear(show.airingPeriod),
+    season: getSeasonLabel(season.air_date) ?? getSeasonLabel(show.airingPeriod),
     episodesWatched: season.episodesWatched ?? 0,
     totalEpisodes: season.episode_count ?? 0,
     type: show.type,

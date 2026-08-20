@@ -1,6 +1,34 @@
 .show-card {
   min-width: 0;
 
+  .progress-button {
+    width: 26px;
+    height: 26px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.08);
+    color: #ffffff;
+    font-size: 18px;
+    line-height: 1;
+    cursor: pointer;
+    transition:
+      background 0.15s ease,
+      border-color 0.15s ease;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.2);
+      border-color: rgba(255, 255, 255, 0.7);
+    }
+
+    &:disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+    }
+  }
+
   .poster-container {
     position: relative;
     width: 100%;
@@ -72,34 +100,6 @@
           gap: 12px;
           margin-top: 8px;
 
-          .progress-button {
-            width: 26px;
-            height: 26px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border: 1px solid rgba(255, 255, 255, 0.35);
-            border-radius: 4px;
-            background: rgba(255, 255, 255, 0.08);
-            color: #ffffff;
-            font-size: 18px;
-            line-height: 1;
-            cursor: pointer;
-            transition:
-              background 0.15s ease,
-              border-color 0.15s ease;
-
-            &:hover {
-              background: rgba(255, 255, 255, 0.2);
-              border-color: rgba(255, 255, 255, 0.7);
-            }
-
-            &:disabled {
-              opacity: 0.3;
-              cursor: not-allowed;
-            }
-          }
-
           .progress-count {
             min-width: 55px;
             text-align: center;
@@ -130,6 +130,14 @@
     }
   }
 
+  // Wraps the title plus the mobile-only meta/progress rows. On desktop
+  // this is just a plain block so the title sits centered under the
+  // poster, same as before; the meta/progress rows only appear once the
+  // card switches to a list row on narrow screens (see media query below).
+  .card-body {
+    min-width: 0;
+  }
+
   .show-title {
     margin-top: 10px;
     text-align: center;
@@ -138,18 +146,125 @@
     font-weight: bold;
     line-height: 1.3;
   }
+
+  .card-title-row {
+    display: block;
+  }
+
+  .card-meta,
+  .mobile-progress,
+  .mobile-rating {
+    display: none;
+  }
 }
 
 @media (max-width: 520px) {
   .show-card {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 12px;
+
     .poster-container {
+      flex: 0 0 84px;
+      width: 84px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+
+      .rating {
+        display: none;
+      }
+
       .hover-overlay {
         display: none;
       }
     }
 
+    .card-body {
+      flex: 1 1 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      padding-top: 2px;
+    }
+
+    .card-title-row {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
     .show-title {
+      margin-top: 0;
+      text-align: left;
       font-size: 0.95rem;
+      line-height: 1.3;
+    }
+
+    .mobile-rating {
+      display: block;
+      flex: 0 0 auto;
+      padding: 1px 6px;
+      background: #dcefa1;
+      color: #182006;
+      font-size: 0.72rem;
+      font-weight: bold;
+      border-radius: 4px;
+      white-space: nowrap;
+    }
+
+    .card-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      font-size: 0.78rem;
+      color: #9aa0ad;
+
+      .meta-text {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+    }
+
+    .mobile-progress {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-top: 2px;
+
+      .progress-bar {
+        width: 100%;
+        height: 5px;
+        border-radius: 3px;
+        overflow: hidden;
+        background: rgba(255, 255, 255, 0.12);
+
+        .progress-bar-fill {
+          height: 100%;
+          transition: width 0.2s ease;
+        }
+      }
+
+      .mobile-progress-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+      }
+
+      .progress-count {
+        font-size: 0.85rem;
+        font-weight: bold;
+        color: #ffffff;
+      }
+
+      .progress-controls {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
     }
   }
 }
