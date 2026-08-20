@@ -220,7 +220,7 @@ $mobile-poster-height: calc($mobile-poster-width * 3 / 2); // matches aspect-rat
     .show-title {
       margin-top: 0;
       text-align: left;
-      font-size: 0.95rem;
+      font-size: 1rem;
       line-height: 1.3;
       display: -webkit-box;
       -webkit-line-clamp: 2;
@@ -288,7 +288,7 @@ $mobile-poster-height: calc($mobile-poster-width * 3 / 2); // matches aspect-rat
       }
 
       .progress-count {
-        font-size: 0.9rem;
+        font-size: 1rem;
         font-weight: bold;
         color: #ffffff;
         min-width: 0;
