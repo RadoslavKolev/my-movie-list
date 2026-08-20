@@ -231,10 +231,10 @@ $mobile-poster-height: calc($mobile-poster-width * 3 / 2); // matches aspect-rat
     .mobile-rating {
       display: block;
       flex: 0 0 auto;
-      padding: 1px 6px;
+      padding: 4px 6px;
       background: #dcefa1;
       color: #182006;
-      font-size: 0.72rem;
+      font-size: 0.85rem;
       font-weight: bold;
       border-radius: 4px;
       white-space: nowrap;
