@@ -2,7 +2,20 @@ import PropTypes from 'prop-types';
 import "./ShowCard.scss";
 
 function ShowCard({ show, onProgressChange, onClick }) {
-  const { id, poster, title, rating = 0, episodesWatched, totalEpisodes, type, status } = show;
+  const {
+    id,
+    poster,
+    title,
+    rating = 0,
+    episodesWatched,
+    totalEpisodes,
+    type,
+    status,
+    year,
+    season,
+  } = show;
+
+  console.log(show);
 
   const getProgressBarColor = (currentStatus) => {
     switch (currentStatus) {
@@ -18,6 +31,17 @@ function ShowCard({ show, onProgressChange, onClick }) {
   };
 
   const progressBarColor = getProgressBarColor(status);
+  const progressPercent = totalEpisodes > 0 ? (episodesWatched / totalEpisodes) * 100 : 0;
+
+  const handleDecrement = (event) => {
+    event.stopPropagation();
+    onProgressChange(id, -1);
+  };
+
+  const handleIncrement = (event) => {
+    event.stopPropagation();
+    onProgressChange(id, 1);
+  };
 
   return (
     <div className="show-card" onClick={onClick}>
@@ -40,10 +64,7 @@ function ShowCard({ show, onProgressChange, onClick }) {
                 type="button"
                 className="progress-button"
                 disabled={episodesWatched <= 0}
-                onClick={(event) => {
-                  event.stopPropagation();
-                  onProgressChange(id, -1);
-                }}
+                onClick={handleDecrement}
               >
                 −
               </button>
@@ -56,10 +77,7 @@ function ShowCard({ show, onProgressChange, onClick }) {
                 type="button"
                 className="progress-button"
                 disabled={episodesWatched >= totalEpisodes}
-                onClick={(event) => {
-                  event.stopPropagation();
-                  onProgressChange(id, 1);
-                }}
+                onClick={handleIncrement}
               >
                 +
               </button>
@@ -68,10 +86,7 @@ function ShowCard({ show, onProgressChange, onClick }) {
               <div
                 className="progress-bar-fill"
                 style={{
-                  width: `${totalEpisodes > 0
-                    ? (episodesWatched / totalEpisodes) * 100
-                    : 0
-                    }%`,
+                  width: `${progressPercent}%`,
                   background: progressBarColor,
                 }}
               />
@@ -82,8 +97,58 @@ function ShowCard({ show, onProgressChange, onClick }) {
           </div>
         </div>
       </div>
-      <div className="show-title">
-        {title}
+
+      <div className="card-body">
+        <div className="card-title-row">
+          <div className="show-title">
+            {title}
+          </div>
+          <div className="mobile-rating">
+            {rating > 0 ? `★ ${rating}` : "N/A"}
+          </div>
+        </div>
+
+        <div className="card-meta">
+          <span className="meta-text">{type} · {year} {season}</span>
+        </div>
+
+        <div className="mobile-progress">
+          <div className="progress-bar">
+            <div
+              className="progress-bar-fill"
+              style={{
+                width: `${progressPercent}%`,
+                background: progressBarColor,
+              }}
+            />
+          </div>
+
+          <div className="mobile-progress-row">
+            <div className="progress-count">
+              {episodesWatched} / {totalEpisodes > 0 ? totalEpisodes : "??"} ep
+            </div>
+
+            <div className="progress-controls">
+              <button
+                type="button"
+                className="progress-button"
+                disabled={episodesWatched <= 0}
+                onClick={handleDecrement}
+              >
+                −
+              </button>
+
+              <button
+                type="button"
+                className="progress-button"
+                disabled={totalEpisodes > 0 && episodesWatched >= totalEpisodes}
+                onClick={handleIncrement}
+              >
+                +
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -98,6 +163,8 @@ ShowCard.propTypes = {
     totalEpisodes: PropTypes.number.isRequired,
     type: PropTypes.string.isRequired,
     status: PropTypes.string,
+    year: PropTypes.number,
+    season: PropTypes.string,
   }).isRequired,
   onProgressChange: PropTypes.func.isRequired,
   onClick: PropTypes.func.isRequired,
